@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Timer from "./Timer";
-import { Modal} from "react-bootstrap";
+import { Modal } from "react-bootstrap";
+import axios from "axios";
 
 export default function Window2() {
   const [text, setText] = useState("");
@@ -9,7 +10,26 @@ export default function Window2() {
   const [results, setResults] = useState(null);
   const [showGif, setShowGif] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const [referenceText, setReferenceText] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
+  const { apikey, testdifficulty } = location.state;
+
+  useEffect(() => {
+    axios
+      .post("http://localhost:8000/typing-text", { apikey, level: testdifficulty })
+      .then((res) => {
+        if (res.data && res.data.message && res.data.message.content) {
+          setReferenceText(res.data.message.content);
+        } else {
+          setReferenceText("No valid response received.");
+        }
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        setReferenceText("Failed to fetch response.");
+      });
+  }, [apikey, testdifficulty]);
 
   const handleOnChange = (event) => {
     setText(event.target.value);
@@ -33,7 +53,6 @@ export default function Window2() {
   };
 
   const calculateResults = () => {
-    const referenceText = "A paragraph is a series of sentences that are organized and coherent, and are all related to a single topic. Almost every piece of writing you do that is longer than a few sentences should be organized into paragraphs. This is because paragraphs show a reader where the subdivisions of an essay begin and end, and thus help the reader see the organization of the essay and grasp its main points.";
     const userWords = text.trim().split(/\s+/);
     const referenceWords = referenceText.trim().split(/\s+/);
     let correctWordsCount = 0;
@@ -70,7 +89,7 @@ export default function Window2() {
               className="form-control"
               id="text"
               rows="6"
-              value="A paragraph is a series of sentences that are organized and coherent, and are all related to a single topic. Almost every piece of writing you do that is longer than a few sentences should be organized into paragraphs. This is because paragraphs show a reader where the subdivisions of an essay begin and end, and thus help the reader see the organization of the essay and grasp its main points."
+              value={referenceText}
               readOnly
             ></textarea>
           </div>

@@ -1,18 +1,23 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Image1 from "./lady.svg"; 
-import Image2 from "./gentleman.svg"; 
+import Image1 from "./lady.svg";
+import Image2 from "./gentleman.svg";
 
 export default function Window1() {
-  const [testdifficulty, settestdifficulty] = useState("Easy");
+  const [testdifficulty, setTestDifficulty] = useState("Easy");
+  const [apikey, setApiKey] = useState("");
   const navigate = useNavigate();
 
-  const handledifficultychange = (event) => {
-    settestdifficulty(event.target.value);
+  const handleDifficultyChange = (event) => {
+    setTestDifficulty(event.target.value);
   };
 
-  const handleOnclick = ()=>{
-    navigate("/Window2");
+  const handleApiKeyChange = (event) => {
+    setApiKey(event.target.value);
+  };
+
+  const handleOnclick = () => {
+    navigate("/Window2", { state: { apikey, testdifficulty } });
   };
 
   return (
@@ -27,10 +32,18 @@ export default function Window1() {
           </div>
           <div className="col-md-4 text-center">
             <div className="test-options">
+              <label><h4>Enter API Key</h4></label>
+              <input
+                type="text"
+                value={apikey}
+                onChange={handleApiKeyChange}
+                className="form-control mb-3"
+                placeholder="Enter API Key"
+              />
               <label><h4>Select Level</h4></label>
               <select
                 value={testdifficulty}
-                onChange={handledifficultychange}
+                onChange={handleDifficultyChange}
                 className="form-select"
               >
                 <option>Easy</option>
